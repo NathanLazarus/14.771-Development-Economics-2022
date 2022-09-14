@@ -83,6 +83,7 @@ ggplot(results_dt) +
     geom_errorbarh(aes(y=quantile, xmin=lb, xmax=ub), height=0.3, size=1, color="steelblue")+
     geom_point(aes(y=quantile, x=Estimate)) +
     theme_cowplot() +
+    scale_y_continuous(n.breaks = 10) +
     # scale_y_continuous(expand = expansion(mult = c(0, .1))) +
     # scale_x_continuous(expand = expansion(mult = c(0, .1))) +
     theme(axis.title.y = element_blank(), plot.title = element_text(hjust = 0)) +
@@ -109,12 +110,12 @@ quantile_reg_results =
         model = suppressWarnings(rq(data$DEMP ~ data$NJ, tau = quantile, data = data))
         result = suppressWarnings(data.table(t(summary(model)$coefficients[2,])))
         setnames(result, c("point_estimate", "lb", "ub"))
-        cbind(result, data.table(quantile = quantile))
+        cbind(result, data.table(quantile = i))
     }
 quantile_reg_results[abs(ub) > 1e2, ub := NA][abs(lb) > 1e2, lb := NA]
 quantile_reg_results[is.na(ub), ub := max(quantile_reg_results$ub, na.rm = TRUE)][is.na(lb), lb := min(quantile_reg_results$lb, na.rm = TRUE)]
 ggplot(quantile_reg_results) +
-    geom_errorbarh(aes(y=quantile, xmin=lb, xmax=ub), height=0.025, size=1, color="steelblue")+
+    geom_errorbarh(aes(y=quantile, xmin=lb, xmax=ub), color="steelblue")+
     geom_point(aes(y=quantile, x=point_estimate)) +
     theme_cowplot() +
     scale_y_continuous(expand = expansion(mult = c(0, .1))) +
